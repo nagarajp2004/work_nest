@@ -5,13 +5,12 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY: Use environment variable for SECRET_KEY
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "your-default-secret-key")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY: Keep DEBUG = False in production
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
-
+DEBUG = "False"
 # SECURITY: Set allowed hosts properly (avoid '*')
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "yourdomain.com").split(",")
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
