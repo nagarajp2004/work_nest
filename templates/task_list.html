@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <h2 class="my-4 text-center text-white">My Tasks</h2>
+        <div class="text-center">
+            <a href="{% url 'task_create' %}" class="btn btn-gradient-primary btn-lg mb-4">+ Add New Task</a>
+        </div>
+
+        <!-- Section for Created Tasks -->
+        <h3 class="mb-3 text-white">Tasks Created by Me</h3>
+        <div class="row">
+            {% for task in created_tasks %}
+                <div class="col-md-6 mb-4">
+                    <div class="card glassmorphism-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-white">{{ task.title }}</h5>
+                            <p class="card-text text-light">
+                                <strong>Status:</strong> <span class="badge bg-info">{{ task.status }}</span><br>
+                                <strong>Assigned to:</strong> {{ task.assigned_to.username }}<br>
+                                <strong>Due Date:</strong> {{ task.due_date }}<br>
+                                <strong>Priority:</strong> <span class="badge bg-{{ task.priority|lower }}">{{ task.priority }}</span>
+                            </p>
+                            <div class="d-flex justify-content-end">
+                                <a href="{% url 'task_update' task.pk %}" class="btn btn-gradient-warning me-2">Edit</a>
+                                <a href="{% url 'task_delete' task.pk %}" class="btn btn-gradient-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="card glassmorphism-card">
+                        <div class="card-body text-center text-white">
+                            No tasks created by you.
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Section for Assigned Tasks -->
+        <h3 class="mt-5 mb-3 text-white">Tasks Assigned to Me</h3>
+        <div class="row">
+            {% for task in assigned_tasks %}
+                <div class="col-md-6 mb-4">
+                    <div class="card glassmorphism-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-white">{{ task.title }}</h5>
+                            <p class="card-text text-light">
+                                <strong>Status:</strong> <span class="badge bg-info">{{ task.status }}</span><br>
+                                <strong>Created by:</strong> {{ task.created_by.username }}<br>
+                                <strong>Due Date:</strong> {{ task.due_date }}<br>
+                                <strong>Priority:</strong> <span class="badge bg-{{ task.priority|lower }}">{{ task.priority }}</span>
+                                <strong>Description:</strong> {{ task.description }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="card glassmorphism-card">
+                        <div class="card-body text-center text-white">
+                            No tasks assigned to you.
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Custom CSS for Sexy Design -->
+    <style>
+        body {
+            background: linear-gradient(135deg,rgb(107, 124, 158),rgb(72, 101, 152));
+            min-height: 100vh;
+            color: white;
+        }
+        .glassmorphism-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .glassmorphism-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        .btn-gradient-primary {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-gradient-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .btn-gradient-warning {
+            background: linear-gradient(135deg,rgb(153, 151, 17),rgb(146, 136, 20));
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-gradient-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .btn-gradient-danger {
+            background: linear-gradient(135deg,rgb(160, 27, 27),rgb(204, 54, 54));
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-gradient-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .badge.bg-high {
+            background-color: #ff6b6b; /* Red for High Priority */
+        }
+        .badge.bg-medium {
+            background-color: #ffd166; /* Yellow for Medium Priority */
+        }
+        .badge.bg-low {
+            background-color: #06d6a0; /* Green for Low Priority */
+        }
+    </style>
+{% endblock %}

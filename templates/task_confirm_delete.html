@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-white">Are you sure you want to delete the task?</h2>
+        <div class="card glassmorphism-card">
+            <div class="card-body">
+                <h5 class="card-title text-white">{{ task.title }}</h5>
+                <p class="card-text text-dark">
+                    <strong>Status:</strong> {{ task.status }}<br>
+                    <strong>Assigned to:</strong> {{ task.assigned_to.username }}<br>
+                    <strong>Due Date:</strong> {{ task.due_date }}<br>
+                    <strong>Priority:</strong> {{ task.priority }}<br>
+                </p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <a href="{% url 'task_list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

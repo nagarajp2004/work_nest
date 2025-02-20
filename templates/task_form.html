@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{%block title%}
+ task form
+{%endblock %}
+
+{%block content%}
+ <div class='container'>
+    <h2 clas='my-4'>{{task.title | default:"new task"}}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{form.as_p}}
+         <div>
+        <button type="submit" class="btn btn-primary">save</button>
+        <a href="{% url 'task_list'%}" class="btn btn-secondary">cancel</a>
+     </form>             
+    </div>
+{%endblock%}
