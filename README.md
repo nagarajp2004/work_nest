@@ -3,112 +3,94 @@
 <img width="1248" height="832" alt="Gemini_Generated_Image_xftyxpxftyxpxfty" src="https://github.com/user-attachments/assets/59013c53-33f8-4e7b-acef-a7169fe28310" />
 
 
+Work Nest: Backend File Structure Explained
+This document provides a detailed breakdown of the key files that make up the Django backend for the Work Nest application.
 
+Analogy Key:
+The Kitchen: The entire Django Backend.
 
-Work Nest: Project Overview & Application Flow
-Work Nest is a full-stack task management application designed with a powerful, hierarchy-based permission system. It allows organizations to control who can assign tasks based on their role and level within the company.
+The Pantry: The Database (SQLite/PostgreSQL).
 
-Core Technologies
-Backend: Django & Django REST Framework (Python)
+The Waiter: The API (Django REST Framework).
 
-Frontend: React (JavaScript, running in a single HTML file)
+The Recipes: The Models (models.py).
 
-Database: SQLite (for development), PostgreSQL (for production)
+The Translator: The Serializers (serializers.py).
 
-Deployment: Azure App Service & Azure Static Web Apps
+The Chef/Brains: The Views (views.py).
 
-API Endpoints & Functionality
-The backend provides a secure REST API for all frontend operations. All endpoints (except for login) require a valid JWT Bearer Token for authorization.
+The Address Book: The URL files (urls.py).
 
-Authentication
-POST /api/token/
+1. backend/api/models.py
+Purpose: This is the architectural blueprint for your database. It defines the structure of your data tables using Python classes.
 
-Functionality: User login. Takes username and password in the request body.
+What it does:
 
-Response: Returns a short-lived access token and a long-lived refresh token upon success.
+The Permission, User, and Task classes in this file directly correspond to the tables in your database.
 
-POST /api/token/refresh/
+Each field within a class (e.g., Task.title = models.CharField(...)) defines a column in that table, specifying its data type (CharField for text, IntegerField for numbers, etc.).
 
-Functionality: Refreshes an expired access token. Takes the refresh token in the body.
+ForeignKey fields are used to create relationships between tables, such as linking a Task to the User who created it.
 
-Response: Returns a new access token.
+Analogy: These are The Recipes in the kitchen's recipe book. They define what ingredients (data) are needed for each dish (data object) and how they are structured.
 
-Users
-GET /api/users/
+2. backend/api/serializers.py
+Purpose: To translate data between the complex Python objects used by Django and the simple JSON format used by web APIs.
 
-Functionality: Retrieves a list of all users in the system, including their id, username, and designation_level. This is used by the frontend to populate the "Assign To" dropdown.
+What it does:
 
-Tasks
-GET /api/tasks/
+Takes data from a database query (a Python Task object) and converts it into JSON to be sent to the React frontend.
 
-Functionality: Retrieves a list of all tasks.
+Takes incoming JSON data from a frontend request (like a new task being created) and converts it back into a Python object that can be saved to the database.
 
-POST /api/tasks/
+Analogy: This is The Translator. It ensures the customer's order (JSON from React) is understood by the kitchen (Python/Django) and that the finished dish (Python object) is presented in a way the customer can understand (JSON).
 
-Functionality: Creates a new task. This endpoint contains the core business logic, checking the creator's permissions (can_assign) and their hierarchical level before allowing the task to be saved.
+3. backend/api/views.py
+Purpose: This is the core logic center of your API. It handles incoming requests, performs actions, and sends back responses.
 
-Permissions
-GET /api/permissions/
+What it does:
 
-Functionality: Retrieves a list of all permission rules. Can be used for administrative purposes or to dynamically show/hide UI elements based on a user's role.
+The TaskViewSet contains the custom logic for task creation.
 
-Core Concept: The Permission System
-The entire application is built around a flexible and secure permission model. It works on two simple principles:
+The perform_create method is where you implemented the critical business rules: checking a user's can_assign permission and comparing their designation_level against the person they are assigning the task to.
 
-Designation Level: Every user has a number (designation_level) that represents their rank (e.g., CEO = 20, Manager = 15, Intern = 1).
+It uses the TaskSerializer to handle data translation and interacts with the Task model to get or save data from the database.
 
-Permission Rules: A separate Permission table in the database acts as a rulebook. For each designation_level, you can set two key flags:
+Analogy: This is The Chef. The chef receives an order from the waiter, gets the ingredients from the pantry based on the recipe, cooks the dish (applies business logic), and gives the finished plate back to the waiter.
 
-can_assign: Can this role assign tasks to people at a lower level?
+4. backend/api/urls.py & backend/backend/urls.py
+Purpose: These files map specific web addresses (URLs) to the corresponding "brain" (View) that should handle them.
 
-can_assign_to_same_level: Can this role assign tasks to people at the same level?
+What they do:
 
-When a user tries to create a task, the backend API acts as a security guard, checking these rules before allowing the task to be created.
+api/urls.py: Defines all the API-specific URLs like /tasks/, /users/, and /token/. The DefaultRouter automatically creates a full set of URLs for each ViewSet (e.g., for listing, creating, deleting tasks).
 
-Application Flow Diagram
-This diagram shows the complete journey from a user logging in to creating a new task, and how the frontend and backend systems interact.
+backend/urls.py: This is the main entry point. It directs any traffic that starts with /api/ to the api/urls.py file to be handled there.
 
-A Note on the "Failed to fetch" Error: The error you highlighted in your screenshot occurs at the very beginning of this flow, on the first arrow moving from the Frontend (React) to the Backend (Django). It means the browser was unable to get any response from the API server, usually because the server isn't running or a network/CORS issue is blocking the connection.
+Analogy: This is The Address Book or phone directory for the kitchen. It tells the system which chef is responsible for which type of order.
 
-Step-by-Step Flow Explanation
-User Login:
+5. backend/api/migrations/0003_seed_initial_data.py
+Purpose: A special, one-time script used to populate a fresh database with essential starting data.
 
-The user opens the React application and sees the Login Page.
+What it does:
 
-They enter their username and password.
+This is a "data migration," not a "schema migration." It doesn't change the table structure; it only adds rows of data.
 
-The React frontend sends a POST request to the Django API's /api/token/ endpoint.
+The script you wrote adds the default Permission levels, creates the initial set of users (manager, teamlead, etc.), and seeds the database with sample tasks.
 
-Django verifies the credentials. If correct, it generates a secure JWT Access Token and sends it back.
+Analogy: This is the Initial Stocking of the Pantry. Before the restaurant opens for the first time, this script ensures the pantry is filled with all the basic ingredients needed to start cooking.
 
-Viewing the Dashboard:
+6. backend/backend/settings.py
+Purpose: The main configuration file for the entire Django project.
 
-The React app receives the token and saves it in the browser's session storage. This marks the user as "logged in."
+What it does:
 
-The app now displays the Task Dashboard.
+Lists all INSTALLED_APPS (like rest_framework and our api app).
 
-To show the list of tasks, React sends a GET request to /api/tasks/, including the saved token in the Authorization header.
+Configures the database connection.
 
-The Django API validates the token, retrieves all tasks from the database, and sends them back as JSON data.
+Contains security settings, like the CORS_ALLOWED_ORIGINS which is crucial for allowing your React frontend to communicate with the backend.
 
-React displays the tasks on the screen.
+Tells Django to use your custom User model instead of the default one (AUTH_USER_MODEL = 'api.User').
 
-Creating a New Task (The Logic Check):
-
-The user clicks the "+ Add Task" button, opening a modal.
-
-The user fills in the task title, description, and selects another user to assign the task to from a dropdown.
-
-When they click "Create Task," React sends a POST request to /api/tasks/, again including the token and the new task data.
-
-This is the most critical step: The Django API receives the request. It validates the token and then performs the business logic checks:
-
-Gate 1: Does the logged-in user's role have can_assign set to True?
-
-Gate 2: Is the logged-in user's designation_level greater than the level of the user they are assigning the task to?
-
-If both checks pass, the task is saved to the database.
-
-If either check fails, the API sends back an error message.
-
-The React app receives the success or error response and updates the user interface accordingly.
+Analogy: This is the Restaurant's Management Office. It holds the operating license, the list of approved suppliers, the keys to the building, and the overall rules for how the restaurant should run.
